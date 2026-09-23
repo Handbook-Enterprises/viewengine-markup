@@ -1,0 +1,86 @@
+name: upstream-watch
+
+# Opens (or updates) one issue when upstream MarkLayer (thevrus/MarkLayer main)
+# has commits that `viewengine` does not, and closes it once they are merged.
+# One issue at a time, labelled `upstream-sync`, so a busy week is one thread.
+
+on:
+  schedule:
+    - cron: "17 13 * * *" # daily, 13:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      UPSTREAM: thevrus:main
+      LABEL: upstream-sync
+    steps:
+      - name: Compare upstream main with viewengine
+        id: cmp
+        run: |
+          set -euo pipefail
+          gh api "repos/$REPO/compare/viewengine...$UPSTREAM" > compare.json
+          echo "count=$(jq '.ahead_by' compare.json)" >> "$GITHUB_OUTPUT"
+          echo "head=$(gh api repos/thevrus/MarkLayer/commits/main --jq .sha)" >> "$GITHUB_OUTPUT"
+
+      - name: Find the open sync issue
+        id: issue
+        run: |
+          set -euo pipefail
+          gh label create "$LABEL" --repo "$REPO" --color 0e6f81 \
+            --description "Upstream MarkLayer changes to merge" 2>/dev/null || true
+          num=$(gh issue list --repo "$REPO" --label "$LABEL" --state open --json number --jq '.[0].number // empty')
+          echo "number=$num" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the issue
+        if: steps.cmp.outputs.count != '0'
+        env:
+          COUNT: ${{ steps.cmp.outputs.count }}
+          HEAD: ${{ steps.cmp.outputs.head }}
+          NUMBER: ${{ steps.issue.outputs.number }}
+        run: |
+          set -euo pipefail
+          {
+            echo "Upstream [thevrus/MarkLayer](https://github.com/thevrus/MarkLayer) \`main\` has **$COUNT commit(s)** that \`viewengine\` does not."
+            echo
+            echo "| Commit | Date | Summary |"
+            echo "| --- | --- | --- |"
+            jq -r '.commits | reverse | .[:50][] |
+              "| [`\(.sha[0:7])`](\(.html_url)) | \(.commit.author.date[0:10]) | \(.commit.message | split("\n")[0] | gsub("\\|"; "\\\\|")) |"' compare.json
+            if [ "$COUNT" -gt 50 ]; then echo; echo "_…and $((COUNT - 50)) more._"; fi
+            echo
+            echo "[Full diff](https://github.com/$REPO/compare/viewengine...$UPSTREAM)"
+            echo
+            echo "### To merge"
+            echo
+            echo '```bash'
+            echo 'git fetch upstream && git checkout main && git merge --ff-only upstream/main && git push origin main'
+            echo 'git checkout viewengine && git merge main   # resolve, run checks'
+            echo 'git push origin viewengine                  # CI deploys'
+            echo '```'
+            echo
+            echo "Watch for: renamed tool names in \`packages/agent-tools\` (published as \`markup_*\` by \`apps/worker/src/tool-names.ts\`), changes to \`wrangler.jsonc\`, new D1 migrations, and anything touching \`index.ts\`'s default export (wrapped by the OAuth provider)."
+            echo
+            echo "<sub>Updated by upstream-watch at upstream \`${HEAD:0:7}\`. Closes itself once \`viewengine\` has everything.</sub>"
+          } > body.md
+          title="Merge upstream MarkLayer ($COUNT new commit$([ "$COUNT" = 1 ] || echo s))"
+          if [ -n "$NUMBER" ]; then
+            gh issue edit "$NUMBER" --repo "$REPO" --title "$title" --body-file body.md
+            echo "updated #$NUMBER"
+          else
+            gh issue create --repo "$REPO" --title "$title" --body-file body.md --label "$LABEL"
+          fi
+
+      - name: Close the issue once caught up
+        if: steps.cmp.outputs.count == '0' && steps.issue.outputs.number != ''
+        env:
+          NUMBER: ${{ steps.issue.outputs.number }}
+        run: gh issue close "$NUMBER" --repo "$REPO" --comment "\`viewengine\` now includes upstream \`main\`. Closing."

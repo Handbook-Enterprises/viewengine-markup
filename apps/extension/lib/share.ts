@@ -139,7 +139,7 @@ export function getShareUrl(): string {
  * out twice — a drifted flag in one copy would hand users a command that fails.
  */
 export function claudeMcpCommand(roomId: string, origin = APP_ORIGIN): string {
-  return `claude mcp add --transport http marklayer ${mcpEndpoint(roomId, origin)}`;
+  return `claude mcp add --transport http markup ${mcpEndpoint(roomId, origin)}`;
 }
 
 /** Where the room answers MCP. The share link is the address, so there is nothing to install. */
@@ -148,8 +148,10 @@ export function mcpEndpoint(roomId: string, origin = APP_ORIGIN): string {
 }
 
 /** The stdio fallback, for a client that cannot reach a remote server yet. */
-export function npxMcpCommand(roomId: string): string {
-  return `npx -y marklayer-mcp --room ${roomId}`;
+export function npxMcpCommand(roomId: string, origin = APP_ORIGIN): string {
+  // The package defaults to marklayer.app; any other deployment has to say so.
+  const apiBase = origin === APP_ORIGIN ? '' : ` --api-base ${origin}`;
+  return `npx -y marklayer-mcp --room ${roomId}${apiBase}`;
 }
 
 /**

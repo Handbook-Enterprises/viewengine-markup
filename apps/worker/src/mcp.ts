@@ -31,6 +31,7 @@ import { nanoid } from 'nanoid';
 import type { AnnotationRoom } from './annotation-room';
 import { outlinePage } from './page-outline';
 import { fetchPage } from './proxy';
+import { publicToolName, publicToolText } from './tool-names';
 
 /**
  * A room reached by RPC instead of a socket.
@@ -268,14 +269,14 @@ export class WorkerRoom implements RoomOps {
  * cheap, and the session it would otherwise hold lives in the Durable Object.
  */
 function buildServer({ room, apiBase }: { room: WorkerRoom; apiBase: string }): McpServer {
-  const server = new McpServer({ name: 'marklayer', version: '1.0.0' });
+  const server = new McpServer({ name: 'viewengine-markup', version: '1.0.0' });
   for (const tool of TOOLS) {
     // connect_room has no meaning here: the room is named in the URL.
     if (tool.name === 'marklayer_connect_room') continue;
     server.registerTool(
-      tool.name,
+      publicToolName(tool.name),
       {
-        description: tool.description,
+        description: publicToolText(tool.description),
         inputSchema: describedSchema(tool.inputSchema),
       },
       async (args: unknown): Promise<ToolContent> => {

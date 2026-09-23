@@ -7,6 +7,7 @@ import { ownedStore } from './auth/store';
 import { WorkerRoom } from './mcp';
 import type { fetchPage } from './proxy';
 import { annotationStore } from './store';
+import { publicToolName, publicToolText } from './tool-names';
 
 /**
  * The account-wide MCP endpoint, `/mcp`.
@@ -81,7 +82,7 @@ function buildAccountServer({
   const shareUrl = (id: string) => `${apiBase}/s/${id}`;
 
   server.registerTool(
-    'marklayer_list_boards',
+    'markup_list_boards',
     {
       description:
         'List the boards saved to your account, newest first, with each share link. Pass a link or id as `room` to the other tools.',
@@ -94,7 +95,7 @@ function buildAccountServer({
   );
 
   server.registerTool(
-    'marklayer_create_board',
+    'markup_create_board',
     {
       description:
         'Open a new board on a public web page, saved to your account. Returns the share link to send to reviewers and to pass as `room`.',
@@ -129,8 +130,8 @@ function buildAccountServer({
     // The room is an argument on every call here, so there is nothing to connect to.
     if (tool.name === 'marklayer_connect_room') continue;
     server.registerTool(
-      tool.name,
-      { description: tool.description, inputSchema: describedSchema(withRoom(tool.inputSchema)) },
+      publicToolName(tool.name),
+      { description: publicToolText(tool.description), inputSchema: describedSchema(withRoom(tool.inputSchema)) },
       async (args: unknown): Promise<ToolContent> => {
         const { room: ref, ...rest } = (args ?? {}) as { room?: unknown } & Record<string, unknown>;
         const id = typeof ref === 'string' ? parseRoomRef(ref) : null;

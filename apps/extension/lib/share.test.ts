@@ -112,12 +112,22 @@ describe('MCP connect commands', () => {
   test('point at the room’s own endpoint, so nothing has to be installed', () => {
     expect(mcpEndpoint('room-42')).toBe('https://marklayer.app/s/room-42/mcp');
     expect(claudeMcpCommand('room-42')).toBe(
-      'claude mcp add --transport http marklayer https://marklayer.app/s/room-42/mcp',
+      'claude mcp add --transport http markup https://marklayer.app/s/room-42/mcp',
     );
   });
 
   test('keep the npx fallback intact, non-interactive flag and all', () => {
     expect(npxMcpCommand('room-42')).toBe('npx -y marklayer-mcp --room room-42');
+  });
+
+  test('a self-hosted deployment names itself, or agents land on marklayer.app', () => {
+    const origin = 'https://markup.viewengine.dev';
+    expect(claudeMcpCommand('room-42', origin)).toBe(
+      'claude mcp add --transport http markup https://markup.viewengine.dev/s/room-42/mcp',
+    );
+    expect(npxMcpCommand('room-42', origin)).toBe(
+      'npx -y marklayer-mcp --room room-42 --api-base https://markup.viewengine.dev',
+    );
   });
 });
 

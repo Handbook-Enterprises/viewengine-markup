@@ -201,18 +201,18 @@ function AgentSection({ id }: { id: string }) {
           <p class="text-meta text-(--ds-gray-900) leading-snug m-0">
             An agent can read this page, work these annotations and resolve them here, live. Run once in your project:
           </p>
-          <CommandField label="Claude Code command" value={claudeMcpCommand(id)} />
+          <CommandField label="Claude Code command" value={claudeMcpCommand(id, location.origin)} />
           <PanelSection label="Cursor, Codex, Windsurf…">
             <div class="flex flex-col gap-1.5">
-              <CommandField label="MCP server URL" value={mcpEndpoint(id)} />
+              <CommandField label="MCP server URL" value={mcpEndpoint(id, location.origin)} />
               <p class="text-meta text-(--ds-gray-900) leading-snug m-0">
-                Add as an HTTP MCP server named "marklayer". Nothing to install — the link is the server.
+                Add as an HTTP MCP server named "markup". Nothing to install — the link is the server.
               </p>
             </div>
           </PanelSection>
           <PanelSection label="Older clients">
             <div class="flex flex-col gap-1.5">
-              <CommandField label="npx command" value={npxMcpCommand(id)} />
+              <CommandField label="npx command" value={npxMcpCommand(id, location.origin)} />
               <p class="text-meta text-(--ds-gray-900) leading-snug m-0">
                 For a client that cannot reach a remote MCP server yet.
               </p>
