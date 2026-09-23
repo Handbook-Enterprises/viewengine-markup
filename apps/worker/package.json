@@ -17,6 +17,7 @@
   "dependencies": {
     "@base-ui/react": "^1.7.0",
     "@cloudflare/vite-plugin": "^1.54.2",
+    "@cloudflare/workers-oauth-provider": "^0.10.3",
     "@hono/zod-openapi": "^1.6.1",
     "@marklayer/agent-tools": "workspace:*",
     "@marklayer/emails": "workspace:*",

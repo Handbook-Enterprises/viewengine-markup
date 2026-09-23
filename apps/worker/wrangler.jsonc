@@ -4,6 +4,8 @@
   "routes": [{ "pattern": "markup.viewengine.dev", "custom_domain": true }],
   "main": "src/index.ts",
   "compatibility_date": "2025-03-01",
+  // SSRF guard the OAuth provider needs before it fetches Client ID Metadata Documents.
+  "compatibility_flags": ["global_fetch_strictly_public"],
   "observability": {
     "enabled": true,
     "logs": {
@@ -40,7 +42,11 @@
       "/f/*", // and retrieval of one
       "/auth/*", // magic-link sign-in
       "/app", // dashboard shell (app.html)
-      "/app/*" // and its client-routed sub-paths, which have no asset of their own
+      "/app/*", // and its client-routed sub-paths, which have no asset of their own
+      "/mcp", // account-wide MCP, behind OAuth (src/oauth.ts)
+      "/mcp/*",
+      "/authorize",
+      "/oauth/*"
     ]
   },
   // Secrets, set with `wrangler secret put <NAME>` — deliberately not `vars`,
@@ -65,6 +71,8 @@
       "migrations_dir": "migrations"
     }
   ],
+  // OAuth grants and tokens for the account-wide /mcp.
+  "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "ed5334f879f64ea79cb8396a572034bd" }],
   "durable_objects": {
     "bindings": [
       {

@@ -73,6 +73,8 @@ export class WorkerRoom implements RoomOps {
     readonly roomId: string,
     private readonly agentId: string,
     private readonly env: Parameters<typeof fetchPage>[0]['env'],
+    /** The signed-in owner when reached through the account-wide `/mcp`; unset on `/s/:id/mcp`. */
+    private readonly userId?: string,
   ) {}
 
   /** One round trip for everything a tool call might read. Also marks the agent present. */
@@ -82,7 +84,7 @@ export class WorkerRoom implements RoomOps {
       name: this.agentId,
       color: agentColor(this.agentId),
     });
-    const snapshot = await this.stub.agentSnapshot(this.roomId);
+    const snapshot = await this.stub.agentSnapshot(this.roomId, this.userId);
     const parsed = opsArraySchema.safeParse(snapshot.ops);
     this.ops = parsed.success ? parsed.data : [];
     this.meta = {
@@ -255,7 +257,7 @@ export class WorkerRoom implements RoomOps {
   }
 
   private async push(op: DrawOp): Promise<boolean> {
-    const written = await this.stub.agentPushOp(this.roomId, op);
+    const written = await this.stub.agentPushOp(this.roomId, op, this.userId);
     if (written) this.ops.push(op);
     return written;
   }

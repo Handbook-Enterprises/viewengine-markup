@@ -298,7 +298,8 @@ export class AnnotationRoom extends DurableObject<Env> {
     }
   }
 
-  async agentSnapshot(id: string): Promise<AgentSnapshot> {
+  /** `userId` is set when the agent signed in over OAuth (`/mcp`), so an owner's agent can edit a view-only link. */
+  async agentSnapshot(id: string, userId?: string): Promise<AgentSnapshot> {
     const raw = await this.getOps(id);
     const parsed = opsArraySchema.safeParse(raw);
     // The owner may have flipped the link since this isolate loaded it, and an
@@ -310,15 +311,15 @@ export class AnnotationRoom extends DurableObject<Env> {
       width: this.width,
       createdAt: this.createdAt,
       expiresAt: effectiveExpiresAt({ expiresAt: this.expiresAt, ownerExpiresAt: this.ownerExpiresAt }),
-      canEdit: this.canEditFor(undefined),
+      canEdit: this.canEditFor(userId),
     };
   }
 
   /** Append one op. `false` means the link is view-only — never that the write failed silently. */
-  async agentPushOp(id: string, op: DrawOp): Promise<boolean> {
+  async agentPushOp(id: string, op: DrawOp, userId?: string): Promise<boolean> {
     const ops = await this.getOps(id);
     await this.refreshAccess(id);
-    if (!this.canEditFor(undefined)) return false;
+    if (!this.canEditFor(userId)) return false;
     ops.push(op);
     this.sessionOps++;
     this.sessionTools.set(op.tool, (this.sessionTools.get(op.tool) ?? 0) + 1);

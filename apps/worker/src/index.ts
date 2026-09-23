@@ -1,3 +1,4 @@
+import { type OAuthHelpers, OAuthProvider } from '@cloudflare/workers-oauth-provider';
 import { DEMO_ROOM, isNewShareId, isUploadId, MAX_UPLOAD_BYTES, RETENTION_DAYS, uploadPath } from '@marklayer/types';
 import LLMS_TXT from '@site/content/agent/llms.txt?raw';
 import LLMS_FULL_TXT from '@site/content/agent/llms-full.txt?raw';
@@ -7,12 +8,14 @@ import { API_CATALOG, MCP_SERVER_CARD, SKILL_PATH, skillIndex } from '@site/lib/
 import type { Context } from 'hono';
 import { Hono } from 'hono/tiny';
 import { nanoid } from 'nanoid';
+import { handleAccountMcpRequest, type McpProps } from './account-mcp';
 import type { AnnotationRoom } from './annotation-room';
 import { api } from './api';
 import { auth, authStore } from './auth';
 import type { EmailEnv } from './email';
 import { cachedPng, dayCached, once, sha256Hex } from './http';
 import { handleMcpRequest, readRoomPage } from './mcp';
+import { handleAuthorize } from './oauth';
 import { generateOgImage, generatePageOgImage } from './og';
 import { collectTally, EMPTY_TALLY_LABEL, plural, tallyParts } from './og-tally';
 import { proxy } from './proxy';
@@ -58,6 +61,10 @@ export type Env = {
      * ever bites. Neither set — the default in dev and in a fork — logs the
      * link instead of sending it, so sign-in still works locally.
      */
+    /** OAuth grants and tokens for the account-wide `/mcp` (oauth.ts). */
+    OAUTH_KV: KVNamespace;
+    /** Injected by OAuthProvider on every request it hands on. */
+    OAUTH_PROVIDER: OAuthHelpers;
   } & EmailEnv;
 };
 
@@ -294,6 +301,10 @@ app.all('/s/:id/mcp', async (c) => {
   });
 });
 
+// OAuth consent for the account-wide `/mcp`. The provider below owns every other
+// OAuth path (discovery, /oauth/token, /oauth/register) and `/mcp` itself.
+app.all('/authorize', (c) => handleAuthorize({ request: c.req.raw, env: c.env }));
+
 // WebSocket endpoint for realtime collaboration
 app.get('/ws/:id', async (c) => {
   const id = c.req.param('id');
@@ -528,4 +539,22 @@ const scheduled: ExportedHandlerScheduledHandler<Env['Bindings']> = async (event
   });
 };
 
-export default { ...app, scheduled };
+const oauth = new OAuthProvider<Env['Bindings']>({
+  apiRoute: '/mcp',
+  apiHandler: {
+    fetch: (request, env, ctx) =>
+      handleAccountMcpRequest({ request, env, props: (ctx as ExecutionContext & { props: McpProps }).props }),
+  },
+  defaultHandler: { fetch: (request, env, ctx) => app.fetch(request, env, ctx) },
+  authorizeEndpoint: '/authorize',
+  tokenEndpoint: '/oauth/token',
+  clientRegistrationEndpoint: '/oauth/register',
+  clientIdMetadataDocumentEnabled: true,
+  scopesSupported: ['mcp'],
+  resourceMetadata: { scopes_supported: ['mcp'], resource_name: 'ViewEngine Markup' },
+});
+
+export default {
+  fetch: (request: Request, env: Env['Bindings'], ctx: ExecutionContext) => oauth.fetch(request, env, ctx),
+  scheduled,
+};

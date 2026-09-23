@@ -11,6 +11,7 @@ import { inviteTemplate, sendEmail, signInTemplate } from '../email';
 import { captureServer } from '../posthog';
 import { inviteStore, nowInSeconds } from '../store';
 import { type AuthVariables, withUser } from './middleware';
+import { NEXT_COOKIE, safeNext } from './next';
 import { authStore, ownedStore } from './store';
 import { mintToken } from './tokens';
 import { type AuthEnv, normalizeEmail, SESSION_COOKIE, SESSION_TTL_SECONDS, type User } from './types';
@@ -141,7 +142,10 @@ auth.get('/verify', async (c) => {
 
   setCookie(c, SESSION_COOKIE, session, sessionCookieOptions(new URL(c.req.url).protocol === 'https:'));
   captureServer(c.env, c.executionCtx, 'sign_in_verified', {});
-  return c.redirect(APP_PATH, 302);
+  // Signed in from an agent's OAuth screen: go back to it rather than the dashboard.
+  const next = safeNext(getCookie(c, NEXT_COOKIE));
+  if (next) deleteCookie(c, NEXT_COOKIE, { path: '/' });
+  return c.redirect(next ?? APP_PATH, 302);
 });
 
 /**
