@@ -4,7 +4,7 @@ import { shareUrl } from '@ext/lib/share';
 import { useCopyToClipboard } from '@ext/lib/useCopy';
 import { cn, DAY_SECONDS, deletionDeadline, type OwnedLink } from '@marklayer/types';
 import { useSignal } from '@preact/signals';
-import { Link2, Settings2, Trash2 } from 'lucide-preact';
+import { Bot, Link2, Settings2, Trash2 } from 'lucide-preact';
 import { CopyControl } from '../shared';
 import { APP_MEASURE } from './AppBar';
 import { LinkSettings } from './LinkSettings';
@@ -240,6 +240,52 @@ function Empty() {
   );
 }
 
+/** One copyable line in the agent panel: what it is for, and the exact text to paste. */
+function AgentLine({ label, value }: { label: string; value: string }) {
+  const { copied, copy } = useCopyToClipboard({ resetMs: 1600 });
+  return (
+    <li class="px-4 py-3">
+      <p class="text-meta mb-1.5 text-(--ds-gray-900)">{label}</p>
+      <div class="flex items-center gap-2">
+        <code class="text-meta min-w-0 flex-1 truncate rounded-md bg-(--ds-gray-alpha-100) px-2.5 py-1.5 font-mono text-(--ds-gray-1000)">
+          {value}
+        </code>
+        <CopyControl
+          copied={copied.value}
+          onClick={() => copy(value)}
+          size={14}
+          strokeWidth={1.5}
+          class={cn(geist.ctlSm, ROW_CTL)}
+        />
+      </div>
+    </li>
+  );
+}
+
+/**
+ * The account-wide MCP (`/mcp`, src/account-mcp.ts). One URL for every board,
+ * signed in over OAuth, so it lives here with the account rather than on a board.
+ */
+function ConnectAgent() {
+  const url = `${location.origin}/mcp`;
+  return (
+    <section class="mt-10">
+      <div class="mb-3 flex items-center gap-2">
+        <Bot size={16} strokeWidth={1.5} class="text-(--ds-gray-900)" aria-hidden="true" />
+        <h2 class="text-ui tracking-ui font-semibold text-(--ds-gray-1000)">Connect an agent</h2>
+      </div>
+      <p class="text-meta leading-body mb-3 text-(--ds-gray-900)">
+        One MCP server for all your links. The agent can list and open boards, then read, reply to and resolve
+        annotations as you. Connecting opens a browser to sign in and approve it.
+      </p>
+      <ul class={cn(PANEL, 'divide-y divide-(--ds-gray-alpha-400)')}>
+        <AgentLine label="Claude Code" value={`claude mcp add --transport http markup ${url}`} />
+        <AgentLine label="claude.ai, Cursor and other MCP clients (server URL)" value={url} />
+      </ul>
+    </section>
+  );
+}
+
 export function Dashboard() {
   const account = user.value;
   const list = links.value;
@@ -283,6 +329,8 @@ export function Dashboard() {
           </p>
         </>
       )}
+
+      <ConnectAgent />
 
       {/* The address, for the reader who lands here from a magic link and wants
           to know which account it signed them into. The bar carries it on wider
