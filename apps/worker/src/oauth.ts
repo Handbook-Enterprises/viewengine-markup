@@ -20,12 +20,12 @@ import { NEXT_COOKIE } from './auth/next';
 const isAuthorizationError = (error: unknown): error is AuthorizationError =>
   error instanceof Error && error.name === 'AuthorizationError';
 
-const escape = (s: string) =>
+const escapeHtml = (s: string) =>
   s.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch] ?? ch);
 
 function page(title: string, body: string, headers: HeadersInit = {}): Response {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>${escape(title)} · ViewEngine Markup</title><link rel="icon" href="/favicon.svg">
+<meta name="robots" content="noindex"><title>${escapeHtml(title)} · ViewEngine Markup</title><link rel="icon" href="/favicon.svg">
 <style>
 :root{--accent:#0e6f81;--fg:#111;--muted:#666;--bg:#f6f8f9;--card:#fff;--line:#e3e8eb}
 @media (prefers-color-scheme:dark){:root{--accent:#58b4c4;--fg:#eee;--muted:#999;--bg:#0f1417;--card:#172024;--line:#26343a}}
@@ -66,9 +66,9 @@ document.getElementById('f').addEventListener('submit', async (e) => {
 function consentPage(action: string, clientName: string, email: string): Response {
   return page(
     'Allow access',
-    `<h1>Allow ${escape(clientName)}?</h1>
-<p>It will be able to list your boards, open new ones, and read, comment on and resolve annotations as <b>${escape(email)}</b>.</p>
-<form method="post" action="${escape(action)}"><button name="decision" value="allow">Allow</button>
+    `<h1>Allow ${escapeHtml(clientName)}?</h1>
+<p>It will be able to list your boards, open new ones, and read, comment on and resolve annotations as <b>${escapeHtml(email)}</b>.</p>
+<form method="post" action="${escapeHtml(action)}"><button name="decision" value="allow">Allow</button>
 <button class="secondary" name="decision" value="deny">Cancel</button></form>`,
   );
 }
@@ -96,7 +96,7 @@ export async function handleAuthorize({
     oauthRequest = await env.OAUTH_PROVIDER.parseAuthRequest(new Request(url.toString()));
   } catch (error) {
     if (!isAuthorizationError(error)) throw error;
-    if (!error.redirectUri) return page('Error', `<h1>Can't connect</h1><p>${escape(error.description)}</p>`);
+    if (!error.redirectUri) return page('Error', `<h1>Can't connect</h1><p>${escapeHtml(error.description)}</p>`);
     const redirect = new URL(error.redirectUri);
     redirect.searchParams.set('error', error.code);
     redirect.searchParams.set('error_description', error.description);

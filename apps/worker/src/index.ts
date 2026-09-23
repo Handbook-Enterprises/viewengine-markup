@@ -551,6 +551,11 @@ const oauth = new OAuthProvider<Env['Bindings']>({
   clientRegistrationEndpoint: '/oauth/register',
   clientIdMetadataDocumentEnabled: true,
   scopesSupported: ['mcp'],
+  // A login lasts until it is revoked (`markup logout`, or revoking the grant):
+  // refresh tokens still rotate on every use, they just never time out, and a
+  // self-registered client (Claude Code, Cursor) is not dropped after 90 days.
+  refreshTokenTTL: undefined,
+  clientRegistrationTTL: undefined,
   resourceMetadata: { scopes_supported: ['mcp'], resource_name: 'ViewEngine Markup' },
 });
 
