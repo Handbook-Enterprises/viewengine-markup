@@ -6,7 +6,7 @@ export default function SignIn() {
   return (
     <Layout preview="Your sign-in link, good for 15 minutes">
       <Heading className="text-ml-fg m-0 mb-3 text-[24px] font-semibold tracking-[-0.02em]">
-        Sign in to MarkLayer
+        Sign in to ViewEngine Markup
       </Heading>
       <Text className="m-0 mb-6 text-[15px] leading-[24px] text-[#4d4d4d]">
         Use the button below. The link works once and expires in 15 minutes.

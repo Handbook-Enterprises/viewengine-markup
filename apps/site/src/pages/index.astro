@@ -16,14 +16,14 @@ import { OG_IMAGE, ORIGIN, WORKER_DEV } from '../lib/site';
  * Everything inside #app is prerendered marketing content that main.tsx wipes
  * on boot. It exists for crawlers and for first paint before the bundle lands.
  */
-const title = 'MarkLayer · Free Webpage, PDF & Image Annotation. No Account.';
+const title = 'ViewEngine Markup';
 const description =
-  'Free web app for annotating any live webpage, PDF or image. Paste a URL or drop a file, draw and comment on it, then share a link. No account, no email, no install. Open source.';
-const ogTitle = 'MarkLayer · Free Webpage, PDF & Image Annotation';
+  'Mark up any live webpage, PDF or image, then share one link for review. ViewEngine internal tool.';
+const ogTitle = 'ViewEngine Markup';
 const ogDescription =
-  'Free web app. Paste any URL or open a PDF or image, draw and comment on it, share a link. 100% free, 100% anonymous. No account, no email, no sign-up, nothing to install.';
+  'Mark up any live webpage, PDF or image, then share one link for review. ViewEngine internal tool.';
 const twitterDescription =
-  'Free web app. Paste a URL or open a PDF or image, draw and comment in your browser, share a link. Real-time collab. No account, no sign-up, nothing to install.';
+  'Mark up any live webpage, PDF or image, then share one link for review. ViewEngine internal tool.';
 
 /* The version and the modified date are derived, never stored in the graph: the
    releases collection is the public version number (the changelog reads the same
@@ -59,7 +59,7 @@ const ld = {
     <meta property="og:description" content={ogDescription} />
     <meta property="og:image" content={OG_IMAGE} />
     <meta property="og:url" content={ORIGIN} />
-    <meta property="og:site_name" content="MarkLayer" />
+    <meta property="og:site_name" content="ViewEngine Markup" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content={OG_IMAGE} />

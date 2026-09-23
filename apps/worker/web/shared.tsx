@@ -88,8 +88,8 @@ export function Logo({ size = 24, class: className }: { size?: number; class?: s
       </g>
       <defs>
         <linearGradient id={id} gradientTransform="rotate(45)" style={{ transformOrigin: 'center center' }}>
-          <stop stop-color="#A855F7" />
-          <stop offset="1" stop-color="#6D28D9" />
+          <stop stop-color="#3D8A96" />
+          <stop offset="1" stop-color="#1D4C55" />
         </linearGradient>
       </defs>
     </svg>

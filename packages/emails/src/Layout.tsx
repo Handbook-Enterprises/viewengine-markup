@@ -28,14 +28,14 @@ export function Layout({ preview, children }: { preview: string; children: React
           {/* The wordmark as type, not an image: a remote logo is blocked by
               default in most clients, and a sign-in email that opens with a
               broken-image icon is the wrong first impression. */}
-          <Text className="text-ml-fg m-0 mb-8 text-[15px] font-semibold tracking-[-0.045em]">MarkLayer</Text>
+          <Text className="text-ml-fg m-0 mb-8 text-[15px] font-semibold tracking-[-0.045em]">ViewEngine Markup</Text>
           {children}
           <Hr className="my-8 border-0 border-t border-solid border-[#eaeaea]" />
           <Section>
             <Text className="m-0 text-[12px] leading-[18px] text-[#8f8f8f]">
-              MarkLayer ·{' '}
-              <a href="https://marklayer.app" className="text-[#8f8f8f]">
-                marklayer.app
+              ViewEngine Markup ·{' '}
+              <a href="https://markup.viewengine.dev" className="text-[#8f8f8f]">
+                markup.viewengine.dev
               </a>
             </Text>
           </Section>

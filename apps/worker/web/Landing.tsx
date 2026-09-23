@@ -6,26 +6,18 @@ import { activeTool, color, comments as commentsComputed, isDrawingTool, lineWid
 import type { TextOp } from '@ext/lib/types';
 import { cn, UPLOAD_ACCEPT } from '@marklayer/types';
 import { useSignal } from '@preact/signals';
-import copy from '@site/data/home-copy.json';
-import { ASK_AI, ASK_AI_LABEL, COLOPHON, FOOTER_COLUMNS, TRADEMARK_NOTICE } from '@site/lib/footer';
-import { CHROME_STORE_URL } from '@site/lib/site';
-import { ArrowRight, ChevronDown, Monitor, Search } from 'lucide-preact';
+import { ArrowRight, Monitor, Search } from 'lucide-preact';
 import { nanoid } from 'nanoid';
 import { useRef } from 'preact/hooks';
-import { capture } from './analytics';
-import { ChannelCycle } from './ChannelCycle';
 import { FakeCursors } from './FakeCursors';
 import { frameViewport } from './iframeOverlay';
-import { ChromeIcon, ChromeStoreLink } from './landing/ChromeStoreLink';
-import { MOMENTS, NAV_LINKS } from './landing/content';
-import { DemoStage } from './landing/DemoStage';
 import { useHeroPin } from './landing/useHeroPin';
 import { useLandingCanvas } from './landing/useLandingCanvas';
 import { useLandingPresence } from './landing/useLandingPresence';
 import { useLandingShortcuts } from './landing/useLandingShortcuts';
 import { useLandingUpload } from './landing/useLandingUpload';
 import { SelfCursor } from './SelfCursor';
-import { GithubLink, ICON_LINK_CLS, Logo, TextInputOverlay } from './shared';
+import { Logo, TextInputOverlay } from './shared';
 import {
   commentPopover,
   embedInView,
@@ -36,7 +28,6 @@ import {
   textInput,
   urlReady,
 } from './signals';
-import { STATUS_LABEL, systemStatus } from './status';
 import { WebCommentPin } from './WebCommentPin';
 import { WebSelectionHighlight } from './WebSelectionHighlight';
 import { WebSelectionPopover } from './WebSelectionPopover';
@@ -102,37 +93,8 @@ export function Landing() {
                   the eye reads as a rendering artifact at this size. The
                   wordmark tracks the mark's size so the lockup keeps its
                   proportion instead of the glyph outgrowing the name. */}
-                <span class="text-heading font-medium tracking-brand text-ml-fg">MarkLayer</span>
+                <span class="text-heading font-medium tracking-brand text-ml-fg">ViewEngine Markup</span>
               </a>
-              <div class="flex items-center gap-0.5 sm:gap-1">
-                {/* From 640, not 768. Below that the links existed only in the
-                    footer, which put every comparison and use-case page behind a
-                    full-page scroll on the widths most likely to be a small
-                    laptop. */}
-                <div class="mr-1 hidden items-center sm:flex">
-                  {NAV_LINKS.map(({ label, href }) => (
-                    <a
-                      key={href}
-                      href={href}
-                      class="rounded-full px-3 py-1.5 text-ui-lg text-ml-fg/70 no-underline transition-colors hover:bg-ml-fg/[0.05] hover:text-ml-fg"
-                    >
-                      {label}
-                    </a>
-                  ))}
-                </div>
-                <a
-                  href="https://www.producthunt.com/posts/marklayer"
-                  target="_blank"
-                  rel="noopener"
-                  class={cn(ICON_LINK_CLS, 'text-ml-fg/60 hover:text-ml-fg')}
-                >
-                  <span class="sr-only">Product Hunt</span>
-                  <svg class="size-[18px] fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M13.604 8.4h-3.405V12h3.405a1.8 1.8 0 0 0 0-3.6ZM12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0Zm1.604 14.4h-3.405V18H7.801V6h5.804a4.2 4.2 0 0 1 0 8.4Z" />
-                  </svg>
-                </a>
-                <GithubLink dark />
-              </div>
             </nav>
 
             {/* Hero. Left-anchored on the same margin as the wordmark, not
@@ -176,10 +138,8 @@ export function Landing() {
                   because it depends on the fixed prefix and not on which
                   channel word happens to be in the slot. */}
                 <h1 class="lp-display lp-fade-up text-hero text-ml-fg" style={{ animationDelay: '0.05s' }}>
-                  <span class="block">{copy.headlinePrefix}</span>
-                  <span class="block">
-                    {copy.headlineJoiner} <ChannelCycle /> {copy.headlineSuffix}
-                  </span>
+                  <span class="block">Mark up any page.</span>
+                  <span class="block">Share one link.</span>
                 </h1>
               </div>
 
@@ -187,8 +147,8 @@ export function Landing() {
                 class="lp-fade-up mt-6 max-w-[44ch] text-lede leading-body text-ml-fg/70"
                 style={{ animationDelay: '0.1s' }}
               >
-                Send your client one link. They comment straight on the live page in their own browser, without signing
-                up or installing anything.
+                Paste a URL, draw and comment on the live page, then send the link to your team or client. No account
+                needed to review.
               </p>
 
               {isMobileDevice ? (
@@ -329,41 +289,6 @@ export function Landing() {
                       }}
                     />
                   </div>
-
-                  {/* One quiet line, not a second filled button. A filled
-                    primary next to an outlined secondary is a preset, and the
-                    fold already has its one clear action above. The install ask
-                    is real but secondary here; it gets the filled treatment
-                    once, in the closing section. Verifiable claims only — the
-                    licence link goes to the repo. */}
-                  <p
-                    class="lp-fade-up mt-9 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-ui text-ml-fg/60"
-                    style={{ animationDelay: '0.25s' }}
-                  >
-                    <a
-                      href={CHROME_STORE_URL}
-                      target="_blank"
-                      rel="noopener"
-                      class="inline-flex items-center gap-1.5 text-ml-fg/70 no-underline transition-colors hover:text-ml-fg"
-                      onClick={() => capture('extension_install_clicked', { at: 'hero' })}
-                    >
-                      <ChromeIcon />
-                      Add to Chrome
-                    </a>
-                    <span aria-hidden="true">·</span>
-                    <span>No account, ever</span>
-                    <span aria-hidden="true">·</span>
-                    <a
-                      href="https://github.com/thevrus/MarkLayer"
-                      target="_blank"
-                      rel="noopener"
-                      class="text-ml-fg/60 hover:text-ml-fg transition-colors underline underline-offset-2 decoration-ml-fg/30"
-                    >
-                      Apache-2.0
-                    </a>
-                    <span aria-hidden="true">·</span>
-                    <span>Self-hostable</span>
-                  </p>
                 </>
               )}
             </section>
@@ -379,305 +304,10 @@ export function Landing() {
               style={{ animationDelay: '0.3s' }}
             >
               <p class="m-0 text-ui text-ml-fg/60">
-                This page is a live MarkLayer board. <span class="text-ml-fg">Pick a tool below and draw on it.</span>
+                This page is a live board. <span class="text-ml-fg">Pick a tool below and draw on it.</span>
               </p>
             </div>
           </div>
-
-          {/* The proof. One real session, shown large, with the three claims
-              named underneath it on a shared grid.
-
-              This replaced an eight-cell grid of icon + label + sentence, each
-              cell ringed in a hairline — eight things at identical weight is no
-              hierarchy at all — and then a left-spine version whose artifacts
-              were small objects parked beside the copy, which was tidy and
-              completely inert. The page under review is the point; the copy
-              names what you are already looking at.
-
-              Opens left, on the same spine as the hero and the wordmark. The
-              sections below it each open differently on purpose: one with a
-              bare sentence, one as a two-column split, one centred. A page
-              where every section starts with a heading in the same place at the
-              same size reads as a template. */}
-          <section class="mx-auto w-full max-w-page px-6 pt-24 pb-20 sm:px-10 sm:pt-32 sm:pb-28">
-            <h2 class="lp-display max-w-[840px] text-statement text-balance text-ml-fg">
-              Three things it does that a screenshot in a thread cannot.
-            </h2>
-            <p class="mt-5 max-w-[52ch] text-lede leading-body text-ml-fg/70 text-pretty">
-              Somebody else&rsquo;s page, opened from a link and marked up in the browser. No install on either end.
-            </p>
-
-            {/* The product, live, not a picture of it.
-
-                This slot has been through three versions: three small objects
-                parked beside three paragraphs (inert), a hand-built "page under
-                review" card (a wireframe), then a real screenshot. The
-                screenshot is still the poster, but what a visitor sees is the
-                actual viewer on the actual Wikipedia article, in a room every
-                visitor shares, wiped hourly by the worker. Scroll pins it and
-                grows it to the whole screen; click it and draw. */}
-            <DemoStage />
-
-            {/* Equal columns on one grid: every title sits on the same line
-                and every description starts on the same line, whatever the
-                copy length, so a longer sentence in one column can never push
-                its neighbours out of step. */}
-            <div class="mt-20 grid grid-cols-1 gap-x-12 gap-y-10 sm:mt-24 sm:grid-cols-3 sm:grid-rows-[auto_auto]">
-              {MOMENTS.map((m) => (
-                <div key={m.title} class="grid gap-y-2.5 sm:row-span-2 sm:grid-rows-subgrid">
-                  <h3 class="text-lede font-semibold tracking-display text-ml-fg">{m.title}</h3>
-                  <p class="m-0 text-body leading-prose text-ml-fg/70 text-pretty">{m.desc}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Switching from another tool. Opens with the sentence itself — no
-              heading above it, no tracked-caps kicker. The claim is the whole
-              section, so wrapping it in a section head would just be a label
-              restating the line underneath it. */}
-          <section class="mx-auto w-full max-w-page px-6 py-20 sm:px-10 sm:py-28">
-            <h2 class="lp-display max-w-[800px] text-section text-balance text-ml-fg">
-              Free alternative to BugHerd, Marker.io, Pastel, and Markup.io.
-            </h2>
-            {/* The durability argument, not just the price. The pricing claims
-                live in home-copy.json, shared with HomeContent.astro. */}
-            <div class="mt-8 grid max-w-[1000px] gap-x-14 gap-y-5 md:grid-cols-2">
-              <p class="m-0 text-body leading-prose text-ml-fg/70 text-pretty">{copy.pricingFacts}</p>
-              <p class="m-0 text-body leading-prose text-ml-fg/70 text-pretty">
-                MarkLayer is free by licence rather than by current pricing policy, so it cannot be withdrawn from under
-                a client workflow: the code is Apache-2.0 and you can self-host it.{' '}
-                <a
-                  href="/guides/free-website-annotation-tools"
-                  class="underline underline-offset-2 decoration-ml-fg/30"
-                >
-                  See the full audit
-                </a>
-                , checked against each vendor&rsquo;s live pricing page.
-              </p>
-            </div>
-            <p class="mt-8 max-w-[62ch] text-ui leading-prose text-ml-fg/60">
-              See{' '}
-              <a href="/compare" class="text-ml-fg/60 underline hover:text-ml-fg/80">
-                all 10 head-to-head comparisons
-              </a>
-              ,{' '}
-              <a href="/alternatives" class="text-ml-fg/60 underline hover:text-ml-fg/80">
-                free alternatives by tool
-              </a>
-              , or the no-extension flow for{' '}
-              <a href="/for/staging-feedback-no-extension" class="text-ml-fg/60 underline hover:text-ml-fg/80">
-                client feedback on a staging site
-              </a>
-              .
-            </p>
-          </section>
-
-          {/* FAQ. A two-column split — the heading holds the left, the answers
-              the right — so this section opens differently again from the two
-              above it. Rows are separated by a surface step, not by the
-              hairline rule that used to sit on top of each one: a bare
-              unrounded line used to fake structure is the cheapest divider
-              there is, and four of them stacked read as a table. */}
-          <section class="mx-auto w-full max-w-page px-6 pb-20 sm:px-10 sm:pb-28">
-            <div class="grid gap-x-16 gap-y-8 md:grid-cols-[minmax(0,300px)_minmax(0,1fr)]">
-              <h2 class="lp-display text-subsection text-balance text-ml-fg">Questions people ask first.</h2>
-              <div class="flex flex-col gap-2">
-                {[
-                  {
-                    q: 'Does the other person need the extension installed?',
-                    a: 'No. Anyone can view your annotations via the share link. No install required.',
-                  },
-                  { q: 'Is it really free?', a: 'Yes. No account, no paywall, no trial period.' },
-                  {
-                    q: 'Does it work on any website?',
-                    a: 'Yes. Production, staging, internal tools, localhost, third-party pages.',
-                  },
-                  {
-                    q: 'Does it work on localhost?',
-                    a: 'Yes, with the Chrome extension. It draws in your browser, so your dev server never has to be reachable from the internet. Share links do need a public URL, so point collaborators at staging or a tunnel.',
-                  },
-                  {
-                    q: 'Can multiple people annotate at the same time?',
-                    a: 'Yes. Real-time cursors let you collaborate live on any page.',
-                  },
-                ].map((item) => (
-                  <details key={item.q} class="lp-panel lp-panel-i group rounded-xl px-5 py-4">
-                    <summary class="-my-2 flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-2 text-body font-medium text-ml-fg">
-                      {item.q}
-                      <ChevronDown
-                        size={16}
-                        class="shrink-0 text-ml-fg/60 transition-transform duration-200 group-open:rotate-180"
-                        aria-hidden="true"
-                      />
-                    </summary>
-                    <p class="mt-3 mb-0 text-ui-lg leading-relaxed text-ml-fg/70">{item.a}</p>
-                  </details>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* The close. The one centred moment on the page, and the only place
-              the install ask gets the filled treatment — the fold carries it as
-              a quiet inline link instead, so a filled primary never sits beside
-              an outlined secondary anywhere here. */}
-          <section class="px-6 pt-24 pb-20 text-center sm:px-10 sm:pt-32 sm:pb-24">
-            <h2 class="lp-display mx-auto mb-8 max-w-[720px] text-closing text-balance text-ml-fg">
-              Start annotating any page on the web.
-            </h2>
-            <ChromeStoreLink label="Add to Chrome" at="closing" />
-            <p class="mt-4 text-ui text-ml-fg/60">Free to use &middot; No sign-up required</p>
-          </section>
-
-          {/* The floor.
-
-              The same footer the marketing pages close with
-              (apps/site/src/components/SiteFooter.astro): same columns, same
-              copy, same spacing, all of it read from `@site/lib/footer`. The
-              two renderers differ only in the width of the column they sit in
-              — this page's sections run to 1120px, an article's to 760 — and
-              each footer stays on its own page's spine rather than one of them
-              being flung wider than everything above it.
-
-              It used to carry eleven hand-picked comparison and use-case links
-              and no trademark line, so the footer changed shape the moment you
-              clicked out of `/`. Those pages are one click away through the
-              hubs that replace them, and the prerendered `/`
-              (HomeContent.astro) still links them all inline for the crawlers
-              that never run this bundle.
-
-              This is the one place a hard surface break is meant: the page
-              steps onto its own floor instead of being ruled off with a
-              hairline.
-
-              The gutter sits inside the capped box here, exactly as it does in
-              every section above. It used to live on the <footer> itself with
-              the cap on the inner div, which centred that cap 40px further out
-              — so at 1440 the page's content spine was at 200px and the
-              footer's at 160px, and the whole block read as slipped. */}
-          <footer class="relative overflow-hidden bg-ml-board-deep pt-16 pb-7">
-            <div class="mx-auto w-full max-w-page px-6 sm:px-10">
-              {/* A grid, not `flex-wrap`: wrapping drops the fourth column onto
-                  its own row as soon as the links grow, leaving three columns
-                  and an orphan off the shared baseline. */}
-              <div class="grid grid-cols-2 gap-x-8 gap-y-9 text-ui sm:grid-cols-4">
-                {FOOTER_COLUMNS.map((col) => (
-                  <div key={col.heading}>
-                    <p class="m-0 mb-3 text-ui font-semibold tracking-label text-ml-fg">{col.heading}</p>
-                    <ul class="m-0 list-none space-y-0.5 p-0">
-                      {col.links.map((l) => (
-                        <li key={l.href} class="m-0 p-0">
-                          <a
-                            href={l.href}
-                            target={l.external ? '_blank' : undefined}
-                            rel={l.external ? 'noopener noreferrer' : undefined}
-                            class="inline-flex min-h-9 items-center text-ml-fg/70 no-underline transition-colors duration-150 pointer-coarse:min-h-11 hover:text-ml-fg"
-                          >
-                            {l.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-
-              {/* The assistant marks, laid out as a fifth column turned on its
-                  side — the label takes the same quiet step as the four
-                  headings above, so it reads as part of the footer rather than
-                  a widget bolted under it. `-mx-2` cancels the first and last
-                  marks' hit-area padding, so the row's optical gaps match the
-                  gap utility instead of running 8px wide at each end. */}
-              <div class="mt-10 flex flex-wrap items-center gap-x-4 gap-y-1">
-                <p class="m-0 text-ui text-ml-fg/65">{ASK_AI_LABEL}</p>
-                <ul class="-mx-2 m-0 flex list-none flex-wrap items-center p-0">
-                  {ASK_AI.map((a) => (
-                    <li key={a.label} class="m-0 p-0">
-                      <a
-                        href={a.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={`Ask ${a.label} about MarkLayer`}
-                        class="inline-flex items-center justify-center rounded-md p-2 text-ml-fg/60 no-underline transition-colors duration-150 pointer-coarse:size-11 pointer-coarse:p-0 hover:text-ml-fg"
-                      >
-                        {/* An sr-only label rather than `aria-label`, the same
-                            way every other bare mark on the site is named: it
-                            survives translation and a stripped attribute, and
-                            it is what the header's GitHub mark already does. */}
-                        <span class="sr-only">Ask {a.label} about MarkLayer</span>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                          <path d={a.path} />
-                        </svg>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* The two closing lines are one tier of fine print: a step
-                  smaller and quieter than the link columns, so the legal
-                  boilerplate is not the heaviest text on the floor. */}
-              <p class="mt-10 mb-0 text-fine text-ml-fg/65">{TRADEMARK_NOTICE}</p>
-              {/* The closing row: the colophon on the page's spine, where the
-                  lockup belongs, and the status line anchored to the opposite
-                  end. Two items on one line rather than a third stacked grey
-                  line. `items-center`, not `items-baseline`: the colophon is
-                  itself a flex row led by the mark, so its first baseline is
-                  the mark's bottom edge rather than the text's, and baseline
-                  alignment dropped the status 5px below the line it sits on.
-
-                  The reference for this row put the status on the left; it is
-                  on the right here because the left edge of the floor is the
-                  brand's edge. Mirrored in SiteFooter.astro. */}
-              <div class="mt-5 flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
-                <p class="m-0 flex items-start gap-2 text-fine text-ml-fg/65">
-                  {/* Aligned to the FIRST line, not to the block: the line
-                      wraps on a phone, and a centred mark then floats between
-                      the two rows. */}
-                  <Logo size={14} class="mt-[3px] shrink-0" />
-                  <span>
-                    &copy; {new Date().getFullYear()} MarkLayer &middot; {COLOPHON}
-                  </span>
-                </p>
-                {/* Starts at `ok`, which is what the page attests — it came
-                    from the Worker that answers `/api/health` — and downgrades
-                    only on a probe that measured D1 or R2 not answering. When it
-                    does, the green and the breath both go: grey and still
-                    against green and breathing is the whole signal, so it needs
-                    no second colour. */}
-                <p class="ml-live" data-ml-status={systemStatus.value} role="status">
-                  {/* The pulse rides the mark only — see `mlLivePulse` in
-                      style.css for why it breathes rather than ringing, and why
-                      the dot is fully rendered if the animation never runs. */}
-                  <span class="ml-live-dot" aria-hidden="true" />
-                  {STATUS_LABEL[systemStatus.value]}
-                </p>
-              </div>
-            </div>
-
-            {/* The signature wordmark: full-bleed, cut at roughly half the cap
-                height, dissolving into the floor.
-
-                It sits outside the page's capped container on purpose — this is
-                the one element that is meant to touch both edges, so it takes
-                no gutter and no max-width. Sized so the word spans the viewport
-                exactly at any width (see .lp-wordmark), clipped to a fraction of
-                its own cap height, and faded out with a long multi-stop mask so
-                the cut is never a visible line. Nothing sits beneath it.
-
-                It is lifted a little clear of the page's bottom edge rather
-                than welded to it, which is a deliberate departure from the
-                usual rule for this move — flush with no gap beneath — because
-                the product's own toolbar floats at the bottom of the viewport
-                and swallowed the band entirely when it sat right on the edge.
-
-                `aria-hidden` because the accessible wordmark is the one in the
-                nav; this is texture, not a second heading. */}
-            <div class="lp-wordmark-clip mt-12 select-none" aria-hidden="true">
-              <span class="lp-wordmark">MarkLayer</span>
-            </div>
-          </footer>
         </main>
 
         {/* Comment overlay.

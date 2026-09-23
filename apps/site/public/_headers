@@ -8,6 +8,7 @@
 
 /*
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Robots-Tag: noindex, nofollow
 
 # Self-hosted webfonts. Content-addressed by name — a new cut ships under a new
 # filename — so they can be cached for a year and never revalidated. The

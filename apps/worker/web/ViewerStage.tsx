@@ -127,7 +127,7 @@ function PageFailure() {
             "allow Cloudflare", which is every Worker on the platform. */}
         {state.renderFailed.value === 'firewall' && state.blockedEgressIp.value && (
           <p class="text-ui text-ml-fg/70 max-w-md leading-snug m-0">
-            Own this site? Your host can allow MarkLayer with one address:{' '}
+            Own this site? Your host can allow ViewEngine Markup with one address:{' '}
             <code class="px-1.5 py-0.5 rounded bg-ml-fg/8 font-mono text-meta text-ml-fg">
               {state.blockedEgressIp.value}
             </code>

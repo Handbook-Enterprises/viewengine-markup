@@ -1,7 +1,7 @@
-export const ORIGIN = 'https://marklayer.app';
+export const ORIGIN = 'https://markup.viewengine.dev';
 export const CHROME_STORE_URL = 'https://chromewebstore.google.com/detail/marklayer/fnfobegjifomgobgilaemihpcpidjamc';
 /** The fallback card, for anything with no heading of its own to draw. */
-export const OG_IMAGE = `${ORIGIN}/og.jpg`;
+export const OG_IMAGE = `${ORIGIN}/og.png`;
 
 /**
  * A card drawn for one page: its own heading, set large, with a stroke under the

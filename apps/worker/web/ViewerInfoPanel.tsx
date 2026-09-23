@@ -1,18 +1,15 @@
 import { PanelSection } from '@ext/components/PanelSection';
 import { geist } from '@ext/lib/geist';
-import { claudeMcpCommand, HOW_IT_WORKS_URL, mcpEndpoint, npxMcpCommand } from '@ext/lib/share';
+import { claudeMcpCommand, mcpEndpoint, npxMcpCommand } from '@ext/lib/share';
 import { annotationPanelOpen, copyText, operations, peerCount } from '@ext/lib/state';
 import { useCopyToClipboard } from '@ext/lib/useCopy';
 import { cn, type DrawOp, deletionDeadline } from '@marklayer/types';
 import {
-  ArrowUpRight,
-  BookOpen,
   Bot,
   Calendar,
   Check,
   Copy,
   Hash,
-  Heart,
   type Info,
   Link,
   Lock,
@@ -27,7 +24,6 @@ import { DOCK_GUTTER, DOCKED_ANNOTATION_WIDTH, DockedPanel, PANEL_SIDEBAR, PANEL
 import { IntegrationsSection } from './IntegrationsSection';
 import { PresenceDot } from './shared';
 import { annotationId, infoPanelOpen, isReadonly, pageUrl, showInfoPanel, timeAgo } from './signals';
-import { openSupportCard } from './support-ui';
 import { connected, createdAt, expiresAt, isOwned } from './useRealtimeSync';
 
 export const INFO_PANEL_WIDTH = 300;
@@ -228,15 +224,6 @@ function AgentSection({ id }: { id: string }) {
   );
 }
 
-/** The panel's bottom rows: the help link and the ask, one grammar for both. */
-const panelLinkRow = cn(
-  geist.sectionLabel,
-  'flex items-center gap-3 h-9 -mx-4 px-4 no-underline outline-none bg-transparent border-none cursor-pointer',
-  'text-(--ds-gray-900) hover:text-(--ds-gray-1000) hover:bg-(--ds-gray-alpha-100)',
-  'transition-[background-color,color] duration-150 ease-out',
-  'focus-visible:outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--ds-focus-color)',
-);
-
 function ToolTally() {
   const ops = operations.value;
   if (ops.length === 0) return null;
@@ -305,23 +292,6 @@ function InfoPanelBody() {
         {id && <AgentSection id={id} />}
         {id && !isReadonly.value && <IntegrationsSection id={id} />}
         <ToolTally />
-        <div class={cn(geist.divider, 'my-2 -mx-4')} />
-        <a href={HOW_IT_WORKS_URL} target="_blank" rel="noopener" class={panelLinkRow}>
-          <BookOpen size={14} strokeWidth={1.5} class="shrink-0" aria-hidden="true" />
-          <span class="flex-1">How MarkLayer works</span>
-          <ArrowUpRight size={14} strokeWidth={1.5} class="shrink-0" aria-hidden="true" />
-        </a>
-        {/* Authors only, because the card itself is: `SupportDialog` renders
-            inside the authoring chrome, so a guest clicking this would set the
-            signal and watch nothing happen. No trailing glyph either — in this
-            panel the chevron means "expands" and the arrow means "leaves", and
-            this does neither. */}
-        {!readonly && (
-          <button type="button" onClick={() => openSupportCard('panel')} class={cn(panelLinkRow, 'w-full text-left')}>
-            <Heart size={14} strokeWidth={1.5} class="shrink-0" aria-hidden="true" />
-            <span class="flex-1">Support MarkLayer</span>
-          </button>
-        )}
       </div>
     </>
   );

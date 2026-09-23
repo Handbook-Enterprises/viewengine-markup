@@ -43,7 +43,7 @@ describe('mailerFor', () => {
       html: '<p>rich</p>',
     });
     expect(sent[0]).toEqual({
-      from: { email: 'login@marklayer.app', name: 'MarkLayer' },
+      from: { email: 'login@marklayer.app', name: 'ViewEngine Markup' },
       to: 'someone@example.com',
       subject: 'Sign in',
       text: 'plain',

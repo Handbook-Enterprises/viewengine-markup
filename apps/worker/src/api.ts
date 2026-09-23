@@ -78,7 +78,7 @@ const openApiJson = once(() =>
     api.getOpenAPI31Document({
       openapi: '3.1.0',
       info: {
-        title: 'MarkLayer Share API',
+        title: 'ViewEngine Markup Share API',
         version: '1.0.0',
         description:
           'Anonymous, no-auth API for creating and reading MarkLayer annotation share links. Pick an unguessable id (nanoid/uuid) — the id is the access token. Share links open at https://marklayer.app/s/{id} (or /p/{id} for project bundles).',

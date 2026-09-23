@@ -57,6 +57,12 @@ if (shellHtml.includes('/web/main.tsx')) {
   process.exit(1);
 }
 
-await cp(siteDist, clientDir, { recursive: true, filter: (src) => src !== join(siteDist, 'index.html') });
+// Self-hosted (markup.viewengine.dev): ship the site's static assets — fonts,
+// icons, _headers, robots/llms — but none of the upstream marketing pages.
+const MARKETING = /\.(html|md)$|sitemap\.xml$/;
+await cp(siteDist, clientDir, {
+  recursive: true,
+  filter: (src) => src !== join(siteDist, 'index.html') && !MARKETING.test(src),
+});
 const pages = (await readdir(siteDist, { recursive: true })).filter((f) => f.endsWith('.html') && f !== 'index.html');
-console.log(`embed:site — copied ${pages.length} prerendered pages into public/client (shell handled by Vite)`);
+console.log(`embed:site — copied static assets, skipped ${pages.length} marketing pages (shell handled by Vite)`);

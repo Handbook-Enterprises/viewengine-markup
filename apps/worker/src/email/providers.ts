@@ -7,7 +7,7 @@ import type { EmailEnv, EmailSendBinding, Mailer } from './types';
  */
 
 /** The display name on every outgoing message, whichever provider carries it. */
-const FROM_NAME = 'MarkLayer';
+const FROM_NAME = 'ViewEngine Markup';
 
 /**
  * Cloudflare Email Service. Sending to an address that is not a verified

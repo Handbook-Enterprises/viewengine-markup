@@ -10,7 +10,7 @@ import { toast } from '@ext/lib/state';
 import { SUPPORT_CHANNEL, SUPPORT_PAID } from '@site/lib/site';
 import { capture } from './analytics';
 import { type SupportTrigger, showSupportDialog } from './signals';
-import { noteSupportSignal, POLAR_CHECKOUT_URL, readSupportRecord, shouldOfferSupport } from './support';
+import { noteSupportSignal, readSupportRecord, shouldOfferSupport } from './support';
 
 /** Open the card and count it. The only place `support_card_shown` is emitted. */
 export function openSupportCard(trigger: SupportTrigger): void {
@@ -27,7 +27,8 @@ export function openSupportCard(trigger: SupportTrigger): void {
 export function maybeOfferSupport(): void {
   const eligible = shouldOfferSupport({
     record: readSupportRecord(),
-    hasCheckout: POLAR_CHECKOUT_URL.length > 0,
+    // Self-hosted internal deployment: never offer the upstream donation card.
+    hasCheckout: false,
   });
   if (eligible) openSupportCard('auto');
 }

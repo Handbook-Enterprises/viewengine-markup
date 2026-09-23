@@ -21,7 +21,6 @@ import { agentLabel, cn, isAgentPeer } from '@marklayer/types';
 import {
   Check,
   ChevronDown,
-  Heart,
   Info,
   Link,
   MessageSquare,
@@ -53,7 +52,6 @@ import {
   viewerZoom,
   ZOOM_PRESETS,
 } from './signals';
-import { openSupportCard } from './support-ui';
 import { connected } from './useRealtimeSync';
 import { useViewerFrame } from './viewerFrame';
 import { videoActive, voiceActive, voiceMuted } from './voiceSignals';
@@ -106,7 +104,7 @@ function BrandLink() {
       )}
     >
       <Logo size={20} />
-      <span class="text-ui font-semibold tracking-ui text-(--ds-gray-1000)">MarkLayer</span>
+      <span class="text-ui font-semibold tracking-ui text-(--ds-gray-1000)">ViewEngine Markup</span>
     </a>
   );
 }
@@ -352,24 +350,6 @@ function PresentButton() {
   );
 }
 
-/**
- * Paired with the card's own gate — a read-only visitor never renders the dialog,
- * so they must never get a button that opens nothing.
- *
- * Sized, stroked and coloured exactly like every other control in the bar. An
- * ask for money is the last thing that should be shouting from the chrome; the
- * tooltip says what it is and the card does the talking.
- */
-function SupportButton() {
-  return (
-    <BarButton
-      icon={<Heart size={16} strokeWidth={1.5} aria-hidden="true" />}
-      tip="Support MarkLayer"
-      onClick={() => openSupportCard('bar')}
-    />
-  );
-}
-
 /** One lookup rather than two parallel ternaries, so a theme cannot gain an icon without a name. */
 const THEMES = {
   system: { Icon: MonitorCog, label: 'System' },
@@ -418,7 +398,6 @@ export function ViewerTopBar() {
           onClick={() => (showAnnotationPanel.value = !showAnnotationPanel.value)}
         />
         {!isReadonly.value && <SharePopover />}
-        {!isReadonly.value && <SupportButton />}
         <ThemeButton />
       </div>
     </div>

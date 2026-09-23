@@ -69,6 +69,9 @@ const app = new Hono<Env>();
 // 2-year max-age with includeSubDomains + preload meets the hstspreload.org
 // submission threshold.
 const HSTS = 'max-age=63072000; includeSubDomains; preload';
+// Self-hosted deployment (markup.viewengine.dev) stays out of search indexes.
+// Asset-served pages get the same header from apps/site/public/_headers.
+const ROBOTS = 'noindex, nofollow';
 app.use('*', async (c, next) => {
   await next();
   // Skip 101 WebSocket upgrades — their headers are locked. Header objects from
@@ -76,9 +79,11 @@ app.use('*', async (c, next) => {
   if (c.res.status !== 101) {
     try {
       c.res.headers.set('Strict-Transport-Security', HSTS);
+      c.res.headers.set('X-Robots-Tag', ROBOTS);
     } catch {
       const headers = new Headers(c.res.headers);
       headers.set('Strict-Transport-Security', HSTS);
+      headers.set('X-Robots-Tag', ROBOTS);
       c.res = new Response(c.res.body, { status: c.res.status, statusText: c.res.statusText, headers });
     }
   }
@@ -137,7 +142,7 @@ app.get('/s/:id', async (c) => {
   const res = await c.env.ASSETS.fetch(new Request(new URL('/', reqUrl)));
   let html = await res.text();
   const ogImage = `${reqUrl.origin}/og/${annotationId}.png?domain=${encodeURIComponent(domain)}`;
-  const title = `MarkLayer \u00b7 Annotations on ${domain}`;
+  const title = `ViewEngine Markup \u00b7 Annotations on ${domain}`;
   const description = shareDescription({ domain, ops: ops ?? [] });
   html = html
     .replace(/<meta property="og:url"[^>]*>/, `<meta property="og:url" content="${reqUrl.href}">`)
@@ -179,7 +184,7 @@ app.get('/p/:id', async (c) => {
   let html = await res.text();
   const ogImage = `${reqUrl.origin}/og/${projectId}.png?domain=${encodeURIComponent(domain)}`;
   const pagesLabel = pageCount > 0 ? ` (${pageCount} pages)` : '';
-  const title = `MarkLayer · Annotations on ${domain}${pagesLabel}`;
+  const title = `ViewEngine Markup · Annotations on ${domain}${pagesLabel}`;
   const description = shareDescription({ domain, ops: firstPageOps ?? [] });
   html = html
     .replace(/<meta property="og:url"[^>]*>/, `<meta property="og:url" content="${reqUrl.href}">`)

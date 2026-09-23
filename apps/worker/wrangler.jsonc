@@ -1,5 +1,7 @@
 {
-  "name": "marklayer-worker",
+  "name": "markup-viewengine",
+  "account_id": "26108e3201e299582e4f6df2912f0b19",
+  "routes": [{ "pattern": "markup.viewengine.dev", "custom_domain": true }],
   "main": "src/index.ts",
   "compatibility_date": "2025-03-01",
   "observability": {
@@ -58,8 +60,8 @@
       // "marklayer" here is the desired name; Cloudflare's registered name for
       // this DB is still "annotateweb" (pre-rename), and `--remote` commands
       // must say that instead — see migrations/ below and CLAUDE.md.
-      "database_name": "marklayer",
-      "database_id": "b19c956e-8602-439b-9c06-242e88da8fbb",
+      "database_name": "markup-viewengine",
+      "database_id": "1b0f84c6-97af-4342-8fb8-7b8b9c5fd79a",
       "migrations_dir": "migrations"
     }
   ],
@@ -74,14 +76,14 @@
   "r2_buckets": [
     {
       "binding": "OG_BUCKET",
-      "bucket_name": "marklayer-og"
+      "bucket_name": "markup-viewengine-og"
     },
     {
       // Uploaded PDFs. Kept separate from OG_BUCKET on purpose: that one is a
       // regenerable cache the cron can evict freely, this one holds the only
       // copy of a user's file until its own retention window clears it.
       "binding": "FILE_BUCKET",
-      "bucket_name": "marklayer-files"
+      "bucket_name": "markup-viewengine-files"
     }
   ],
   // Cloudflare Email Service. Unrestricted on purpose — a magic link goes to
@@ -91,7 +93,7 @@
   // verified destination addresses on the account can receive anything.
   "send_email": [{ "name": "EMAIL" }],
   "vars": {
-    "MAIL_FROM": "login@marklayer.app"
+    "MAIL_FROM": "login@from.viewengine.dev"
     // MAIL_PROVIDER ("cloudflare" | "resend" | "console") pins the mailer and is
     // deliberately unset: with no pin, `mailerFor` takes the EMAIL binding above,
     // and a dev run with no binding falls to the console so the link prints in

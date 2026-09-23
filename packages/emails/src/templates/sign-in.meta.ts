@@ -7,18 +7,18 @@
  */
 export const id = 'sign-in';
 
-export const subject = 'Your MarkLayer sign-in link';
+export const subject = 'Your ViewEngine Markup sign-in link';
 
 /** Substituted at send time. Build-time rendering means no data is available yet. */
 export const PLACEHOLDER = { link: '{{link}}' } as const;
 
 export const text = [
-  'Sign in to MarkLayer',
+  'Sign in to ViewEngine Markup',
   '',
   'Open this address to sign in. It works once and expires in 15 minutes.',
   PLACEHOLDER.link,
   '',
   'If you did not ask to sign in, ignore this email. Nothing will happen.',
   '',
-  'MarkLayer · marklayer.app',
+  'ViewEngine Markup · markup.viewengine.dev',
 ].join('\n');

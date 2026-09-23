@@ -1,0 +1,7 @@
+{
+  "name": "markup-viewengine-ai-redirect",
+  "account_id": "26108e3201e299582e4f6df2912f0b19",
+  "main": "index.js",
+  "compatibility_date": "2026-09-01",
+  "routes": [{ "pattern": "markup.viewengine.ai", "custom_domain": true }]
+}
