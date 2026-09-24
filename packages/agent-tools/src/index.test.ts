@@ -124,6 +124,13 @@ describe('callRoomTool', () => {
     const whole = { text: 'hi', x: 0, y: 0, selector: '#a', tag: 'button', markdown: '`<button>`' };
     expect(body(await run('marklayer_create_annotation', whole)).id).toBe('new-1');
   });
+
+  test('pins to an element without coordinates, but needs one or the other', async () => {
+    const anchored = { text: 'hi', selector: '#a', tag: 'button', markdown: '`<button>`' };
+    expect(body(await run('marklayer_create_annotation', anchored)).id).toBe('new-1');
+    expect((await run('marklayer_create_annotation', { text: 'hi' }))?.isError).toBe(true);
+    expect((await run('marklayer_create_annotation', { text: 'hi', x: 1 }))?.isError).toBe(true);
+  });
 });
 
 describe('describedSchema', () => {

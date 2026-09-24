@@ -99,6 +99,21 @@ describe('resolveAnchorPoint', () => {
     expect(resolveAnchorPoint(target({ rect: undefined }), ctx)).toMatchObject({ scaleX: 1, scaleY: 1 });
   });
 
+  test('pins an element-only target (as an agent sends it) to the element top-left', () => {
+    mount('<h1 id="hero">Pricing</h1>');
+    layout(pick('#hero'), { x: 100, y: 260, width: 400, height: 100 });
+    window.scrollTo(0, 500);
+    const agent = target({ rect: undefined, offsetX: undefined, offsetY: undefined });
+    // The agent's own x/y (the fallback) is ignored once the element resolves.
+    expect(resolveAnchorPoint(agent, ctx, { docX: 5, docY: 5 })).toEqual({
+      x: 100,
+      y: 760,
+      scaleX: 1,
+      scaleY: 1,
+      strategy: 'primary',
+    });
+  });
+
   test('reconstructs a missing offset from the stored anchor for a legacy op', () => {
     mount('<h1 id="hero">Pricing</h1>');
     layout(pick('#hero'), { x: 100, y: 260, width: 400, height: 100 });
