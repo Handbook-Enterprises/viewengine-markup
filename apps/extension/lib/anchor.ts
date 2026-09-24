@@ -173,6 +173,13 @@ export function resolveAnchorPoint(
     offsetX = fallback.docX - target.rect.x;
     offsetY = fallback.docY - target.rect.y;
   }
+  // An element-only target (selector, tag, markdown: what an agent passes
+  // through the MCP, with no captured box or offset) pins to the element's
+  // top-left. Without this it never re-anchored and sat at the agent's x/y.
+  if ((offsetX === undefined || offsetY === undefined) && !target.rect) {
+    offsetX = 0;
+    offsetY = 0;
+  }
   if (offsetX === undefined || offsetY === undefined) return null;
   const doc = ctx?.doc ?? document;
   const win = ctx?.win ?? doc.defaultView ?? window;
